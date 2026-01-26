@@ -316,7 +316,14 @@ if (navigator.share) {
   
 
   return (
-    <main className="min-h-screen bg-emerald-800 p-6 flex flex-col gap-4">
+    <main className="bg-emerald-800 p-6 flex flex-col gap-3">
+<a
+  href="/"
+  className="mb-2 inline-block text-sm font-semibold text-emerald-200 hover:text-white transition underline"
+>
+  ← Back to Home
+</a>
+
 
 
 <header className="mx-auto w-full max-w-4xl rounded-2xl bg-emerald-900/90 p-4 shadow-lg ring-2 ring-white/80">
@@ -693,9 +700,9 @@ if (navigator.share) {
   hintActiveNonce={hintNonce}
 
 />
-      <a href="/" className="inline-flex text-sm font-semibold text-white/80 hover:text-white">
-        ← Back to Home
-      </a>
+     
+
+
     </main>
   );
 }
