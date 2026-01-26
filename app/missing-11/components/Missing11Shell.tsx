@@ -237,35 +237,35 @@ const sheetDisplayName = activePlayer
       .join("");
   
     // Wordle-ish copy
-    const text = `Missing 11 ⚽️
-  ${teamName} · ${matchDate}
-  
-  ${emojiLine}
-  
-  Score: ${shareScore}/110
-  Play: ${url}`;
+    const text = `I scored ${shareScore} on World Cup Missing 11! ⚽️
+                  Can you do better?
+                  
+                  Play here now!`;
+    
   
     // 1) Try native share first
-    if (navigator.share) {
-      try {
-        const nativeText = `${text}\n${url}`;
+if (navigator.share) {
+  try {
+    await navigator.share({
+      title: "World Cup Missing 11",
+      text,   // <-- NO raw URL in here
+      url,    // <-- link lives here
+    });
 
-        await navigator.share({
-          text: nativeText,
-        });
-        
-        return; // shared successfully
-      } catch (err: any) {
-        console.log("Native share failed:", {
-          name: err?.name,
-          message: err?.message,
-          err,
-        });
-      
-        if (err?.name === "AbortError") return;
-        // fall through to clipboard
-      }
-    }
+    return; // shared successfully
+  } catch (err: any) {
+    console.log("Native share failed:", {
+      name: err?.name,
+      message: err?.message,
+      err,
+    });
+
+    // User cancelled share sheet (Wordle-style: do nothing)
+    if (err?.name === "AbortError") return;
+    // otherwise fall through to clipboard
+  }
+}
+
   
     // 2) Clipboard fallback (NO prompt)
     try {
