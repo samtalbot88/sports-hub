@@ -237,10 +237,12 @@ const sheetDisplayName = activePlayer
       .join("");
   
     // Wordle-ish copy
-    const text = `I scored ${shareScore} on World Cup Missing 11! ⚽️
-                  Can you do better?
-                  
-                  Play here now!`;
+    const text = [
+      `I scored ${shareScore} on World Cup Missing 11! ⚽️`,
+      `Can you do better?`,
+      `Play here now!`,
+    ].join("\n");
+    
     
   
     // 1) Try native share first
