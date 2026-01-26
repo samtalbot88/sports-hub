@@ -100,7 +100,7 @@ if (!difficulty) {
         <section className="grid gap-4 sm:grid-cols-2">
         <Link
   href="/missing-11?difficulty=easy"
-  className="rounded-2xl bg-emerald-800/80 ring-2 ring-white/40 p-6 hover:bg-emerald-700 transition"
+  className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700"
 >
   <div className="text-lg font-extrabold text-white">
     Easy
@@ -118,7 +118,7 @@ if (!difficulty) {
 
 <Link
   href="/missing-11?difficulty=hard"
-  className="rounded-2xl bg-emerald-800/80 ring-2 ring-white/40 p-6 hover:bg-emerald-700 transition"
+  className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700"
 >
   <div className="text-lg font-extrabold text-white">
     Hard

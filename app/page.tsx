@@ -74,7 +74,8 @@ export default function HomePage() {
 
 
             {/* COMING SOON */}
-            <div className="rounded-2xl border-2 border-white/40 bg-emerald-800/40 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
+
             <div className="text-lg font-extrabold text-white">
   Wordle Cup
 </div>
@@ -89,7 +90,8 @@ export default function HomePage() {
 
             </div>
 
-            <div className="rounded-2xl border-2 border-white/40 bg-emerald-800/40 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
+
 
             <div className="text-lg font-extrabold text-white">
   Who Scored?
@@ -111,7 +113,8 @@ export default function HomePage() {
 <section>
   <h2 className="text-2xl font-bold mb-6">News</h2>
 
-  <div className="rounded-2xl border-2 border-white/40 bg-emerald-800/40 p-6 backdrop-blur-sm">
+  <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
+
     <div className="text-lg font-extrabold text-white">
       World Cup News
     </div>
