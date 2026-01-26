@@ -54,6 +54,13 @@ const isDev = devValue === "true";
 if (!difficulty) {
   return (
     <main className="min-h-screen bg-emerald-900 text-white p-6">
+      <a
+  href="/"
+  className="mb-6 inline-block text-sm font-semibold text-emerald-200 hover:text-white transition underline"
+>
+  ← Back to Home
+</a>
+
       <div className="mx-auto w-full max-w-4xl space-y-8">
 
         {/* Header card */}
@@ -91,36 +98,44 @@ if (!difficulty) {
 
         {/* Difficulty cards */}
         <section className="grid gap-4 sm:grid-cols-2">
-          <Link
-            href="/missing-11?difficulty=easy"
-            className="rounded-2xl border-2 border-white/40 bg-emerald-800/80 p-6 backdrop-blur-sm transition hover:bg-emerald-700"
-          >
-            <div className="text-lg font-extrabold text-white">Easy</div>
-            <p className="mt-2 text-sm font-semibold text-white/80">
-              Big teams • Modern World Cups (2010–2022)
-            </p>
-            <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
-              Play Now!
-            </span>
-          </Link>
+        <Link
+  href="/missing-11?difficulty=easy"
+  className="rounded-2xl bg-emerald-800/80 ring-2 ring-white/40 p-6 hover:bg-emerald-700 transition"
+>
+  <div className="text-lg font-extrabold text-white">
+    Easy
+  </div>
 
-          <Link
-            href="/missing-11?difficulty=hard"
-            className="rounded-2xl border-2 border-white/40 bg-emerald-800/40 p-6 backdrop-blur-sm transition hover:bg-emerald-700/60"
-          >
-            <div className="text-lg font-extrabold text-white">Hard</div>
-            <p className="mt-2 text-sm font-semibold text-white/80">
-              Other teams • 1980 onwards
-            </p>
-            <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
-              Play Now!
-            </span>
-          </Link>
+  <p className="mt-2 text-m font-semibold text-white/90">
+    Big teams • Modern World Cups (2010–2022)
+  </p>
+
+  <span className="mt-3 inline-block text-s font-semibold text-emerald-200">
+    Play Now!
+  </span>
+</Link>
+
+
+<Link
+  href="/missing-11?difficulty=hard"
+  className="rounded-2xl bg-emerald-800/80 ring-2 ring-white/40 p-6 hover:bg-emerald-700 transition"
+>
+  <div className="text-lg font-extrabold text-white">
+    Hard
+  </div>
+
+  <p className="mt-2 text-m font-semibold text-white/90">
+    Other teams • 1980 onwards
+  </p>
+
+  <span className="mt-3 inline-block text-s font-semibold text-emerald-200">
+    Play Now! 
+  </span>
+</Link>
+
         </section>
 
-        <Link href="/" className="inline-flex text-sm font-semibold text-white/80 hover:text-white">
-          ← Back to Home
-        </Link>
+       
       </div>
     </main>
   );

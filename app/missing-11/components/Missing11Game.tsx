@@ -384,6 +384,7 @@ function updatePlayerState(playerId: string, state: any) {
   </div>
 ))}
 </div>
+
   </section>
   
 

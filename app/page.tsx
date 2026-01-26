@@ -1,11 +1,16 @@
 import Link from "next/link";
+import Image from "next/image";
+
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-emerald-900 text-white">
+      
 
-      {/* HERO */}
-      <section className="relative w-full h-[40vh] sm:h-[60vh] overflow-hidden">
+    
+{/* HERO */}
+<section className="relative w-full h-[40vh] sm:h-[60vh] overflow-hidden">
+
   {/* Mobile hero */}
   <img
     src="/hero-world-cup.png"
@@ -13,17 +18,31 @@ export default function HomePage() {
     className="absolute inset-0 h-full w-full object-cover sm:hidden"
   />
 
-  {/* Desktop hero (21:9) */}
+  {/* Desktop hero */}
   <img
     src="/hero-world-cup-desktop.png"
     alt="World Cup football stadium"
     className="absolute inset-0 h-full w-full object-cover hidden sm:block"
   />
 
+  {/* dark overlay — desktop only */}
+<div className="absolute inset-0 hidden sm:block bg-black/25" />
 
 
- 
+  {/* TEXT OVERLAY — DESKTOP ONLY */}
+<div className="absolute inset-0 hidden sm:flex items-start">
+  <div className="mx-auto w-full max-w-6xl px-6 pt-16">
+    <h1 className="max-w-xl text-left text-4xl font-extrabold leading-tight text-white drop-shadow-lg">
+      World Cup games & content
+      <br />
+      for fans worldwide
+    </h1>
+  </div>
+</div>
+
+
 </section>
+
 
 
       {/* CONTENT */}
@@ -73,11 +92,11 @@ export default function HomePage() {
             <div className="rounded-2xl border-2 border-white/40 bg-emerald-800/40 p-6 backdrop-blur-sm">
 
             <div className="text-lg font-extrabold text-white">
-  Who Am I?
+  Who Scored?
 </div>
 
 <p className="mt-2 text-sm font-semibold text-white/80">
-  Guess the player from clues based on their World Cup performances.
+  Guess the goalscorers from an iconic World Cup fixture.
 </p>
 
 <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
