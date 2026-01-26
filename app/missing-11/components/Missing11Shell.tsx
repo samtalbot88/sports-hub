@@ -690,14 +690,9 @@ const sheetDisplayName = activePlayer
   hintActivePlayerId={activePlayerId}
   hintActiveNonce={hintNonce}
 
-
-
-  
 />
-
-
-      <a href="/" className="text-blue-600 underline">
-        ← Back to World Cup Hub
+      <a href="/" className="inline-flex text-sm font-semibold text-white/80 hover:text-white">
+        ← Back to Home
       </a>
     </main>
   );
