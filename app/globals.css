@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.wordlecup-tile-flip {
+  animation: wordleCupTileFlip 600ms ease both;
+  will-change: transform;
+}
+
+@keyframes wordleCupTileFlip {
+  0% {
+    transform: perspective(800px) rotateX(0deg);
+  }
+  49% {
+    transform: perspective(800px) rotateX(90deg);
+  }
+  50% {
+    transform: perspective(800px) rotateX(90deg);
+  }
+  100% {
+    transform: perspective(800px) rotateX(0deg);
+  }
+}
+
