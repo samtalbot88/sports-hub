@@ -22,12 +22,15 @@ export default function WordleCupGame({
     puzzleId,
     difficulty,
     isDev,
+    onCompleteChange,
   }: {
     answer: string;
     puzzleId: string;
     difficulty: "easy" | "hard";
     isDev: boolean;
+    onCompleteChange?: (complete: boolean) => void;
   }) {
+  
   
   const [guesses, setGuesses] = useState<GuessRow[]>([]);
   const [currentGuess, setCurrentGuess] = useState("");
@@ -77,6 +80,8 @@ export default function WordleCupGame({
       if (Array.isArray(parsed.guesses)) setGuesses(parsed.guesses);
       if (typeof parsed.currentGuess === "string") setCurrentGuess(parsed.currentGuess);
       if (typeof parsed.isComplete === "boolean") setIsComplete(parsed.isComplete);
+      if (typeof parsed.isComplete === "boolean") onCompleteChange?.(parsed.isComplete);
+
       if (typeof parsed.resultRecorded === "boolean") setResultRecorded(parsed.resultRecorded);
       resultRecordedRef.current = Boolean(parsed.resultRecorded);
       setIsHydrated(true);
@@ -210,6 +215,8 @@ window.setTimeout(() => {
       // Win OR used all 6 attempts
       if (isWin || next.length >= 6) {
         setIsComplete(true);
+        onCompleteChange?.(true);
+
         setIsModalOpen(true);
 
       
@@ -532,7 +539,8 @@ const keyboardStates = keyboardFreeze
 
 
 {isModalOpen ? (
-  <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+
     {/* Backdrop */}
     <button
       type="button"
@@ -542,71 +550,70 @@ const keyboardStates = keyboardFreeze
     />
 
     {/* Modal */}
-    <div className="relative w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl border-2 border-white/80 bg-emerald-900 p-6 shadow-2xl">
+    <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white p-5 shadow-xl">
+
     <div className="flex items-start justify-between gap-4">
   <div className="min-w-0">
-  <div className="text-xl font-extrabold text-white">
+  <div className="text-lg font-bold text-gray-900">
+
   {didWin ? "You got it!" : "Unlucky!"}
 </div>
 
-    <div className="mt-1 text-sm font-semibold text-white/80">
-      {guesses.length}/6
+<div className="mt-1 text-sm font-semibold text-gray-600">
+
+      Attempts: {guesses.length}/6
     </div>
     {!didWin ? (
-  <div className="mt-2 text-sm font-semibold text-white/80">
-    Answer: <span className="text-white font-extrabold">{answer}</span>
-  </div>
+  <div className="mt-2 text-sm font-semibold text-gray-600">
+  Answer: <span className="text-gray-900 font-extrabold">{answer}</span>
+</div>
+
 ) : null}
 
   </div>
 
   <button
-    type="button"
-    className="rounded-xl border-2 border-white/40 bg-white/10 px-3 py-1 text-sm font-extrabold text-white hover:bg-white/20 transition"
-    onClick={() => setIsModalOpen(false)}
-  >
-    Close
-  </button>
+  type="button"
+  className="rounded-xl bg-gray-100 px-3 py-1.5 text-sm font-extrabold text-gray-900 hover:bg-gray-200 transition"
+  onClick={() => setIsModalOpen(false)}
+>
+  Close
+</button>
+
 </div>
 
 <div className="mt-6 grid grid-cols-2 gap-3">
-  <div className="rounded-2xl border-2 border-white/40 bg-white/10 p-4 text-center">
-    <div className="text-2xl font-extrabold text-white tabular-nums">
+  <div className="rounded-2xl bg-gray-100 p-4 text-center">
+    <div className="text-2xl font-bold text-gray-900 tabular-nums">
       {currentStreak}
     </div>
-    <div className="mt-1 text-xs font-bold uppercase tracking-wide text-white/70">
+    <div className="mt-1 text-xs font-bold uppercase tracking-wide text-gray-600">
       Current streak
     </div>
   </div>
 
-  <div className="rounded-2xl border-2 border-white/40 bg-white/10 p-4 text-center">
-    <div className="text-2xl font-extrabold text-white tabular-nums">
+  <div className="rounded-2xl bg-gray-100 p-4 text-center">
+    <div className="text-2xl font-bold text-gray-900 tabular-nums">
       {bestStreak}
     </div>
-    <div className="mt-1 text-xs font-bold uppercase tracking-wide text-white/70">
+    <div className="mt-1 text-xs font-bold uppercase tracking-wide text-gray-600">
       Best streak
     </div>
   </div>
 </div>
 
-<div className="mt-6 rounded-2xl border-2 border-white/40 bg-white/10 p-4">
-  <div className="text-xs font-bold uppercase tracking-wide text-white/70">
-    Your grid
-  </div>
 
-  <pre className="mt-3 whitespace-pre font-mono text-sm leading-5 text-white">
-    {buildEmojiGrid()}
-  </pre>
-</div>
+
 
 <div className="mt-6">
-  <button
-    type="button"
-    className="w-full rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-4 font-extrabold text-white shadow-lg backdrop-blur-sm transition hover:bg-emerald-700"
-    onClick={handleShare}
-  >
-    Share
-  </button>
+<button
+  type="button"
+  className="w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] hover:bg-emerald-600"
+  onClick={handleShare}
+>
+  Share
+</button>
+
 </div>
 
     </div>

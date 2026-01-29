@@ -408,10 +408,11 @@ if (navigator.share) {
   </div>
 
   {!isDev && isHydrated && resolvedCount === 11 ? (
-    <div className="text-xs text-gray-600">
-      Completed for today — come back tomorrow for a new puzzle.
-    </div>
-  ) : null}
+  <div className="mt-3 px-2 text-sm font-bold text-white">
+    Completed for today — come back tomorrow for a new puzzle.
+  </div>
+) : null}
+
 </header>
 
 {showCompletion ? (
@@ -426,13 +427,41 @@ if (navigator.share) {
 
     {/* modal card */}
     <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white p-5 shadow-xl">
-      <div className="text-lg font-bold">Completed! 🎉</div>
+    <div className="flex items-start justify-between gap-4">
+  <div className="min-w-0">
+    <div className="text-lg font-bold text-gray-900">Completed! 🎉</div>
+  </div>
+
+  <button
+    type="button"
+    className="rounded-xl bg-gray-100 px-3 py-1.5 text-sm font-extrabold text-gray-900 hover:bg-gray-200 transition"
+    onClick={() => {
+      setShowCompletion(false);
+
+      if (isDev) {
+        // reset for replay in dev mode
+        setResolvedCount(0);
+        setScore(0);
+        setFinalScore(null);
+        setGameKey((k) => k + 1);
+        localStorage.removeItem(`missing11:${difficulty}:${puzzleId}`);
+      }
+    }}
+  >
+    Close
+  </button>
+</div>
+
 
       <div className="mt-6 text-center">
         <div className="text-sm font-medium text-gray-600">Today’s score</div>
 
         <div className="relative mt-3 inline-flex items-center justify-center rounded-3xl bg-blue-50 px-8 py-4">
-          <span className="text-5xl font-semibold leading-none tracking-tight text-green-600 tabular-nums">
+
+
+        <span className="text-5xl font-semibold leading-none tracking-tight text-green-600 tabular-nums">
+
+
             {finalScore ?? score}
           </span>
         </div>
@@ -441,30 +470,14 @@ if (navigator.share) {
       <div className="mt-6 grid gap-2">
         <button
           type="button"
-          className="w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] hover:bg-blue-700"
+          className="w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] hover:bg-emerald-600"
+
           onClick={handleShare}
         >
           Share
         </button>
 
-        <button
-          type="button"
-          className="w-full rounded-2xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-900 transition active:scale-[0.99] hover:bg-gray-200"
-          onClick={() => {
-            setShowCompletion(false);
-
-            if (isDev) {
-              // reset for replay in dev mode
-              setResolvedCount(0);
-              setScore(0);
-              setFinalScore(null);
-              setGameKey((k) => k + 1);
-              localStorage.removeItem(`missing11:${difficulty}:${puzzleId}`);
-            }
-          }}
-        >
-          Close
-        </button>
+      
       </div>
 
       {isDev ? (

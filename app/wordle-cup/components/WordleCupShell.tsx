@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+
+
 type Difficulty = "easy" | "hard";
 import WordleCupGame from "./WordleCupGame";
 
@@ -12,6 +15,7 @@ export default function WordleCupShell({
   matchName,
   matchDate,
   teamName,
+
 }: {
   answer: string;
   puzzleId: string;
@@ -21,6 +25,9 @@ export default function WordleCupShell({
   matchDate: string;
   teamName: string;
 }) {
+
+  const [isComplete, setIsComplete] = useState(false);
+
   return (
     <main className="bg-emerald-800 p-6 flex flex-col gap-3 min-h-screen text-white">
       <a
@@ -53,22 +60,32 @@ export default function WordleCupShell({
 </div>
 
   
-            {isDev ? (
-              <div className="mt-2 text-sm font-semibold text-emerald-200">
-                DEV MODE: Answer is {answer}
-              </div>
-            ) : null}
+{!isDev && isComplete ? (
+  <div className="mt-3 px-2 text-sm font-bold text-white">
+    Completed for today — come back tomorrow for a new puzzle.
+  </div>
+) : null}
+
+{isDev ? (
+  <div className="mt-3 text-sm font-semibold text-emerald-200">
+    DEV MODE: Answer is {answer}
+  </div>
+) : null}
+
           </div>
         </header>
   
         {/* Game (NOT inside a bordered card) */}
         <div className="mt-4">
-          <WordleCupGame
-            answer={answer}
-            puzzleId={puzzleId}
-            difficulty={difficulty}
-            isDev={isDev}
-          />
+        <WordleCupGame
+  answer={answer}
+  puzzleId={puzzleId}
+  difficulty={difficulty}
+  isDev={isDev}
+  onCompleteChange={setIsComplete}
+/>
+
+
         </div>
       </div>
     </main>
