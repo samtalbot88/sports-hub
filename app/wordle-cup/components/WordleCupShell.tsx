@@ -82,6 +82,7 @@ export default function WordleCupShell({
   puzzleId={puzzleId}
   difficulty={difficulty}
   isDev={isDev}
+  countryName={teamName}
   onCompleteChange={setIsComplete}
 />
 

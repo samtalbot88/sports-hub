@@ -39,17 +39,23 @@ const puzzleIdValue = Array.isArray(rawPuzzleId)
   ? rawPuzzleId[0]
   : rawPuzzleId;
 
+  const rawDev = sp?.dev;
+const devValue = Array.isArray(rawDev) ? rawDev[0] : rawDev;
+const isDev = devValue === "true";
 
   const difficulty =
     value === "easy" || value === "hard" ? (value as Difficulty) : null;
-    const puzzleId =
-  typeof puzzleIdValue === "string" && puzzleIdValue.length === 10
-    ? puzzleIdValue
-    : new Date().toISOString().slice(0, 10);
+    const today = new Date().toISOString().slice(0, 10);
 
-const rawDev = sp?.dev;
-const devValue = Array.isArray(rawDev) ? rawDev[0] : rawDev;
-const isDev = devValue === "true";
+const puzzleId =
+  typeof puzzleIdValue === "string" &&
+  puzzleIdValue.length === 10 &&
+  (isDev || puzzleIdValue <= today) // block future dates unless dev=true
+    ? puzzleIdValue
+    : today;
+
+
+
 
 
 

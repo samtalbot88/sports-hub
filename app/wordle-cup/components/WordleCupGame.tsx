@@ -22,14 +22,17 @@ export default function WordleCupGame({
     puzzleId,
     difficulty,
     isDev,
+    countryName,
     onCompleteChange,
   }: {
     answer: string;
     puzzleId: string;
     difficulty: "easy" | "hard";
     isDev: boolean;
+    countryName: string;
     onCompleteChange?: (complete: boolean) => void;
   }) {
+  
   
   
   const [guesses, setGuesses] = useState<GuessRow[]>([]);
@@ -81,7 +84,6 @@ export default function WordleCupGame({
       if (typeof parsed.currentGuess === "string") setCurrentGuess(parsed.currentGuess);
       if (typeof parsed.isComplete === "boolean") setIsComplete(parsed.isComplete);
       if (typeof parsed.isComplete === "boolean") onCompleteChange?.(parsed.isComplete);
-
       if (typeof parsed.resultRecorded === "boolean") setResultRecorded(parsed.resultRecorded);
       resultRecordedRef.current = Boolean(parsed.resultRecorded);
       setIsHydrated(true);
@@ -212,37 +214,43 @@ window.setTimeout(() => {
       
 
     
-      // Win OR used all 6 attempts
-      if (isWin || next.length >= 6) {
-        setIsComplete(true);
-        onCompleteChange?.(true);
-
-        setIsModalOpen(true);
-
-      
-         // Record streak result exactly once per puzzle
-         if (!resultRecordedRef.current) {
-
-    if (isWin) {
-      setCurrentStreak((s) => {
-        const next = s + 1;
-        setBestStreak((b) => Math.max(b, next));
-        return next;
-      });
-    } else {
-      setCurrentStreak(0);
-    }
-    resultRecordedRef.current = true;
-     setResultRecorded(true);
-  }
-
-      }
+     
       
     
       return next;
     });
     
     setCurrentGuess("");
+
+    // ✅ Delay completion + modal until AFTER the full flip reveal finishes
+const shouldComplete = isWin || guesses.length + 1 >= 6;
+
+if (shouldComplete) {
+  const totalFlipTimeMs = (answer.length - 1) * 140 + 180 + 420;
+
+  window.setTimeout(() => {
+    setIsComplete(true);
+    onCompleteChange?.(true);
+    setIsModalOpen(true);
+
+    // Record streak result exactly once per puzzle
+    if (!resultRecordedRef.current) {
+      if (isWin) {
+        setCurrentStreak((s) => {
+          const nextStreak = s + 1;
+          setBestStreak((b) => Math.max(b, nextStreak));
+          return nextStreak;
+        });
+      } else {
+        setCurrentStreak(0);
+      }
+
+      resultRecordedRef.current = true;
+      setResultRecorded(true);
+    }
+  }, totalFlipTimeMs);
+}
+
     
   }
 
@@ -560,15 +568,16 @@ const keyboardStates = keyboardFreeze
 </div>
 
 <div className="mt-1 text-sm font-semibold text-gray-600">
-
-      Attempts: {guesses.length}/6
-    </div>
-    {!didWin ? (
-  <div className="mt-2 text-sm font-semibold text-gray-600">
-  Answer: <span className="text-gray-900 font-extrabold">{answer}</span>
+  Answer:{" "}
+  <span className="text-gray-900 font-extrabold">
+    {answer} ({countryName})
+  </span>
 </div>
 
-) : null}
+<div className="mt-2 text-sm font-semibold text-gray-600">
+  Attempts: {guesses.length}/6
+</div>
+
 
   </div>
 
