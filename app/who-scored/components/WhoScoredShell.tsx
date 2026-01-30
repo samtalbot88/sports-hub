@@ -66,12 +66,17 @@ export default function WhoScoredShell({
     players: Record<
       string,
       {
+        // Mobile sheet state
         status: "idle" | "correct" | "revealed";
         hintUsed: boolean;
         pointsAwarded: number | null;
+  
+        // Desktop box state (from WhoScoredGuessBox)
+        boxState?: any;
       }
     >;
   };
+  
   
   const [persisted, setPersisted] = useState<PersistedWhoScoredState>({
     players: {},
@@ -108,6 +113,20 @@ export default function WhoScoredShell({
       pointsAwarded: null as number | null,
     };
   }
+
+  function setPlayerBoxState(playerId: string, boxState: any) {
+    setPersisted((prev) => ({
+      ...prev,
+      players: {
+        ...(prev.players ?? {}),
+        [playerId]: {
+          ...getPlayerState(playerId),
+          boxState,
+        },
+      },
+    }));
+  }
+  
   
   function setPlayerState(
     playerId: string,
@@ -270,6 +289,12 @@ useEffect(() => {
       isSolved: getPlayerState(g.player_id).status === "correct",
       isRevealed: getPlayerState(g.player_id).status === "revealed",
     }));
+
+    const playerStatesForScoreboard: Record<string, any> = {};
+for (const [playerId, p] of Object.entries(persisted.players ?? {})) {
+  if (p?.boxState) playerStatesForScoreboard[playerId] = p.boxState;
+}
+
   
 
   return (
@@ -353,7 +378,9 @@ useEffect(() => {
                 setSheetValue("");
                 setSheetShake(false);
               }}
-              
+              playerStates={playerStatesForScoreboard}
+onPlayerStateChange={(playerId, state) => setPlayerBoxState(playerId, state)}
+
               
 
 

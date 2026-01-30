@@ -50,7 +50,8 @@ type PlayerBoxProps = {
       .replace(/\s+/g, " ");
   }
   
-  
+
+
 
   const WhoScoredGuessBox = forwardRef<PlayerBoxHandle, PlayerBoxProps>(function WhoScoredGuessBox(
 
@@ -65,9 +66,18 @@ type PlayerBoxProps = {
     },
     ref
   ) {
+    
+    const [hasMounted, setHasMounted] = useState(false);
+
+useEffect(() => {
+  setHasMounted(true);
+}, []);
+
   
-  
-  const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(
+        typeof window !== "undefined" && window.innerWidth >= 640
+      );
+      
   const [shake, setShake] = useState(false);
   const [value, setValue] = useState(persistedState?.value ?? "");
   const valueRef = useRef(value);
@@ -364,18 +374,25 @@ flex flex-col items-center justify-start pt-2 text-xs text-white
         ) : null}
       </div>
 
+
+
       {/* Input (desktop and also visible when editing on mobile if you still want it) */}
       <div
         className={`${
           status === "correct" || revealed || disabled
             ? "hidden"
-            : isEditing
+            : (hasMounted ? isEditing : false)
             ? ""
             : "hidden sm:block"
+             
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`${shake ? "shake" : ""} mt-1 sm:mt-2 px-2`}>
+   <div className="mt-1 sm:mt-2 px-2">
+
+
+
+
           <input
             className="mt-1 w-full rounded-md bg-white/10 px-2 py-1 text-xs text-white placeholder:text-white/60 ring-2 ring-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/90"
             placeholder="Enter Player"

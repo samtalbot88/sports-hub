@@ -27,6 +27,9 @@ type GoalMinute = {
     isAET: boolean;
     homeGoals: (PlayerGoalGroup & { isSolved?: boolean })[];
     awayGoals: (PlayerGoalGroup & { isSolved?: boolean })[];
+    playerStates?: Record<string, any>;
+onPlayerStateChange?: (playerId: string, state: any) => void;
+
     
     onScorerTap?: (playerId: string) => void;
   };
@@ -41,6 +44,8 @@ type GoalMinute = {
     homeGoals,
     awayGoals,
     onScorerTap,
+    playerStates,
+    onPlayerStateChange,
   }: Props) {
   
   
@@ -104,8 +109,13 @@ type GoalMinute = {
             maskedName={g.isSolved ? g.family_name : maskSurname(g.family_name)}
             answer={g.family_name}
             minutesLabel={minutesLabel}
-            disabled={true}
+            disabled={false}
+
+
             onClick={() => onScorerTap?.(g.player_id)}
+            persistedState={playerStates?.[g.player_id]}
+onStateChange={(state) => onPlayerStateChange?.(g.player_id, state)}
+
           />
           
           
@@ -133,8 +143,13 @@ type GoalMinute = {
   maskedName={g.isSolved ? g.family_name : maskSurname(g.family_name)}
   answer={g.family_name}
   minutesLabel={minutesLabel}
-  disabled={true}
+  disabled={false}
+
+
   onClick={() => onScorerTap?.(g.player_id)}
+  persistedState={playerStates?.[g.player_id]}
+onStateChange={(state) => onPlayerStateChange?.(g.player_id, state)}
+
 />
 
           

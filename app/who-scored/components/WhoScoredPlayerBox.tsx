@@ -43,7 +43,10 @@ const WhoScoredPlayerBox = forwardRef<PlayerBoxHandle, Props>(function WhoScored
           shirtNumber={" "}
           maskedName={maskedName}
           answer={answer}
-          disabled={true}
+          disabled={disabled}
+
+
+
 
           persistedState={persistedState}
           onStateChange={onStateChange}
@@ -55,7 +58,9 @@ const WhoScoredPlayerBox = forwardRef<PlayerBoxHandle, Props>(function WhoScored
           <button
             type="button"
             aria-label="Open scorer entry"
-            className="absolute inset-0 z-20"
+            className="absolute inset-0 z-20 sm:hidden"
+
+
 
 
             onClick={onClick}
@@ -65,8 +70,10 @@ const WhoScoredPlayerBox = forwardRef<PlayerBoxHandle, Props>(function WhoScored
 
       {/* Minutes always visible under the box */}
       <div className="mt-1 text-[11px] font-bold text-white/70 text-center max-w-[7.5rem]">
-        {minutesLabel}
-      </div>
+  {minutesLabel}
+</div>
+
+
     </div>
   );
 });
