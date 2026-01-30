@@ -8,7 +8,8 @@ export type GoalMinute = {
     isPen: boolean;
   };
   
-  export type PlayerGoalGroup = {
+  export type WhoScoredPlayerGoalGroup = {
+
     player_id: string;
     family_name: string;
     given_name: string;
@@ -98,18 +99,7 @@ function formatMinuteLabel(row: GoalRow) {
   return raw;
 }
 
-type PlayerGoalGroup = {
-  player_id: string;
-  family_name: string;
-  given_name: string;
-  team_name: string;
-  team_code: string;
-  minutes: Array<{
-    label: string; // e.g. "23'"
-    isOG: boolean;
-    isPen: boolean;
-  }>;
-};
+
 
 export function getWhoScoredPuzzle({
   difficulty,
@@ -206,10 +196,12 @@ export function getWhoScoredPuzzle({
   const chosen = candidates[matchIndex];
 
   // 4) Group goals by team then by player_id, sort minutes ascending
-  function groupTeamGoals(teamFlag: "home_team" | "away_team"): PlayerGoalGroup[] {
+  function groupTeamGoals(teamFlag: "home_team" | "away_team"): WhoScoredPlayerGoalGroup[] {
+
     const goalsForTeam = chosen.goals.filter((g) => g[teamFlag] === "1");
 
-    const byPlayer = new Map<string, PlayerGoalGroup>();
+    const byPlayer = new Map<string, WhoScoredPlayerGoalGroup>();
+
     for (const g of goalsForTeam) {
       const existing = byPlayer.get(g.player_id);
       const minute: GoalMinute = {

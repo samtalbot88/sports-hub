@@ -1,4 +1,8 @@
 import WhoScoredPlayerBox from "./WhoScoredPlayerBox";
+import type { WhoScoredPlayerGoalGroup as PlayerGoalGroup } from "../../../lib/getWhoScoredPuzzle";
+
+
+
 function maskSurname(name: string) {
     // exactly like Missing11Shell: keeps spaces + hyphens, masks letters as "-"
     return name.replace(/\p{L}/gu, "-");
@@ -12,12 +16,7 @@ type GoalMinute = {
     isPen: boolean;
   };
   
-  type PlayerGoalGroup = {
-    player_id: string;
-    family_name: string;
-    minutes: GoalMinute[];
-    isSolved?: boolean;
-  };
+
   
   
   type Props = {
@@ -26,8 +25,9 @@ type GoalMinute = {
     homeScore: number;
     awayScore: number;
     isAET: boolean;
-    homeGoals: PlayerGoalGroup[];
-    awayGoals: PlayerGoalGroup[];
+    homeGoals: (PlayerGoalGroup & { isSolved?: boolean })[];
+    awayGoals: (PlayerGoalGroup & { isSolved?: boolean })[];
+    
     onScorerTap?: (playerId: string) => void;
   };
   

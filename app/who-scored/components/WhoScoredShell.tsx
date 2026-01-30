@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 
 
 import WhoScoredScoreboard from "./WhoScoredScoreboard";
-import type { PlayerGoalGroup } from "../../../lib/getWhoScoredPuzzle";
+import type { WhoScoredPlayerGoalGroup as PlayerGoalGroup } from "../../../lib/getWhoScoredPuzzle";
+
 
 type Props = {
   puzzleId: string;
