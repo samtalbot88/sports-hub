@@ -142,11 +142,33 @@ export function getWhoScoredPuzzle({
     const sample = goals[0];
     const year = getYear(sample.match_date);
 
-    // Compute match teams + score from goal rows
-    const homeTeamName =
-      goals.find((g) => g.home_team === "1")?.team_name ?? "";
-    const awayTeamName =
-      goals.find((g) => g.away_team === "1")?.team_name ?? "";
+  // Compute match teams
+// IMPORTANT: teams with 0 goals will not appear in goal rows
+const rawMatchName = (sample.match_name || "").trim();
+
+// remove any trailing extra text like " (Group ...)" if it exists
+const cleanMatchName = rawMatchName.split("(")[0].trim();
+
+// support multiple separators we might see in the dataset
+const parts =
+  cleanMatchName.includes(" v ")
+    ? cleanMatchName.split(" v ")
+    : cleanMatchName.includes(" vs ")
+    ? cleanMatchName.split(" vs ")
+    : cleanMatchName.includes(" v. ")
+    ? cleanMatchName.split(" v. ")
+    : [cleanMatchName];
+
+const parsedHome = (parts[0] || "").trim();
+const parsedAway = (parts[1] || "").trim();
+
+
+const homeTeamName =
+  parsedHome || goals.find((g) => g.home_team === "1")?.team_name || "";
+
+const awayTeamName =
+  parsedAway || goals.find((g) => g.away_team === "1")?.team_name || "";
+
 
     const homeScore = goals.filter((g) => g.home_team === "1").length;
     const awayScore = goals.filter((g) => g.away_team === "1").length;
