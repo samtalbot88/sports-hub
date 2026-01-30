@@ -2,7 +2,7 @@
 
 import { getLineup } from "../../lib/getLineup";
 import Missing11Shell from "./components/Missing11Shell";
-
+import { getWhoScoredPuzzle } from "../../lib/getWhoScoredPuzzle";
 
 
 
@@ -39,7 +39,7 @@ const puzzleIdValue = Array.isArray(rawPuzzleId)
   const rawDev = sp?.dev;
   const devValue = Array.isArray(rawDev) ? rawDev[0] : rawDev;
   const isDev = devValue === "true";
-  
+
   const difficulty =
     value === "easy" || value === "hard" ? (value as Difficulty) : null;
     const today = new Date().toISOString().slice(0, 10);
@@ -154,6 +154,12 @@ if (!difficulty) {
     difficulty,
     puzzleId,
   });
+  
+
+
+const debugGoals = getWhoScoredPuzzle({ difficulty, puzzleId });
+console.log("WHO SCORED DEBUG", debugGoals);
+
 
  
   

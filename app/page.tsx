@@ -1,10 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+
 
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState<"games" | "news" | "fixtures">("games");
+
+
   return (
     <main className="min-h-screen bg-emerald-900 text-white">
+
+
+
+
       
 
     
@@ -46,11 +57,69 @@ export default function HomePage() {
 
 
       {/* CONTENT */}
-      <div className="mx-auto max-w-6xl px-6 py-12 space-y-14">
+      <div className="mx-auto max-w-6xl px-6 pt-6 pb-12 space-y-10">
 
-        {/* GAMES */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">Games</h2>
+
+{/* TABS */}
+<div className="flex gap-10 mb-10">
+  <button
+    type="button"
+    onClick={() => setActiveTab("games")}
+    className={`relative text-2xl font-bold transition ${
+      activeTab === "games"
+        ? "text-white"
+        : "text-white/60 hover:text-white"
+    }`}
+  >
+    Games
+    {activeTab === "games" && (
+      <span className="absolute left-0 bottom-0 h-[3px] w-full rounded-full bg-white translate-y-full" />
+
+    )}
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("news")}
+    className={`relative text-2xl font-bold transition ${
+      activeTab === "news"
+        ? "text-white"
+        : "text-white/60 hover:text-white"
+    }`}
+  >
+    News
+    {activeTab === "news" && (
+      <span className="absolute left-0 bottom-0 h-[3px] w-full rounded-full bg-white translate-y-full" />
+
+    )}
+  </button>
+
+  <button
+  type="button"
+  onClick={() => setActiveTab("fixtures")}
+  className={`relative text-2xl font-bold transition ${
+    activeTab === "fixtures"
+      ? "text-white"
+      : "text-white/60 hover:text-white"
+  }`}
+  
+>
+  Fixtures
+  {activeTab === "fixtures" && (
+      <span className="absolute left-0 bottom-0 h-[3px] w-full rounded-full bg-white translate-y-full" />
+
+    )}
+</button>
+
+</div>
+
+
+
+     {/* GAMES */}
+{activeTab === "games" ? (
+<section>
+
+          
 
           <div className="grid gap-4 sm:grid-cols-3">
 
@@ -58,6 +127,7 @@ export default function HomePage() {
             <Link
   href="/missing-11"
   className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700"
+
 >
 <div className="flex items-center justify-between">
   <div className="text-lg font-extrabold text-white">
@@ -131,28 +201,40 @@ export default function HomePage() {
 </Link>
 
 
-            <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
+<Link
+  href="/who-scored"
+  className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700"
+>
+  <div className="flex items-center justify-between">
+    <div className="text-lg font-extrabold text-white">
+      Who Scored?
+    </div>
 
+    <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-950/50 ring-1 ring-white/20 shadow-lg backdrop-blur-[2px]">
+      <span className="text-xl" aria-hidden="true">⚽️</span>
+    </div>
+  </div>
 
-            <div className="text-lg font-extrabold text-white">
-  Who Scored?
-</div>
+  <p className="mt-2 text-sm font-semibold text-white/80">
+    Guess the goalscorers from an iconic World Cup fixture.
+  </p>
 
-<p className="mt-2 text-sm font-semibold text-white/80">
-  Guess the goalscorers from an iconic World Cup fixture.
-</p>
+  <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-emerald-200">
+    ● Live
+  </span>
+</Link>
 
-<span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
-  Coming soon
-</span>
-
-            </div>
           </div>
-        </section>
+          </section>
+) : null}
 
-       {/* NEWS */}
+
+      
+{/* NEWS */}
+{activeTab === "news" ? (
 <section>
-  <h2 className="text-2xl font-bold mb-6">News</h2>
+
+
 
   <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
 
@@ -168,7 +250,28 @@ export default function HomePage() {
       Coming soon
     </span>
   </div>
-</section>
+  </section>
+) : null}
+
+{activeTab === "fixtures" ? (
+  <section>
+    <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
+      <div className="text-lg font-extrabold text-white">
+        World Cup Fixtures
+      </div>
+
+      <p className="mt-2 text-sm font-semibold text-white/80">
+        Match schedules, kick-off times and upcoming World Cup fixtures.
+      </p>
+
+      <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
+        Coming soon
+      </span>
+    </div>
+  </section>
+) : null}
+
+
 
 
         {/* FOOTER */}
