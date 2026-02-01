@@ -30,7 +30,6 @@ type GoalMinute = {
     playerStates?: Record<string, any>;
 onPlayerStateChange?: (playerId: string, state: any) => void;
 
-    
     onScorerTap?: (playerId: string) => void;
   };
   

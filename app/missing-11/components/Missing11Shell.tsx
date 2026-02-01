@@ -204,9 +204,29 @@ const isCorrect = activeState?.status === "correct";
 const isLocked = isRevealed || isCorrect;
 // Sheet name display (step 1): default to masked surname for now
 // Sheet name display: show full name once correct or revealed, otherwise masked
+function applyTypedToMask(mask: string, typed: string) {
+  const chars = mask.split("");
+  let ti = 0;
+
+  for (let i = 0; i < chars.length; i++) {
+    if (chars[i] === "-") {
+      const next = typed[ti];
+      if (!next) break;
+
+      chars[i] = ti === 0 ? next.toUpperCase() : next.toLowerCase();
+      ti += 1;
+    }
+  }
+
+  return chars.join("");
+}
+
 const sheetDisplayName = activePlayer
-  ? (isLocked ? activePlayer.family_name : maskSurname(activePlayer.family_name))
+  ? isLocked
+    ? activePlayer.family_name
+    : applyTypedToMask(maskSurname(activePlayer.family_name), sheetValue)
   : "";
+
 
 
 

@@ -68,14 +68,23 @@ const WhoScoredPlayerBox = forwardRef<PlayerBoxHandle, Props>(function WhoScored
         ) : null}
       </div>
 
+ 
+
+
       {/* Minutes always visible under the box */}
       <div className="mt-1 text-[11px] font-bold text-white/70 text-center max-w-[7.5rem]">
   {minutesLabel}
 </div>
 
 
+
     </div>
   );
 });
 
+
+
 export default WhoScoredPlayerBox;
+
+
+  

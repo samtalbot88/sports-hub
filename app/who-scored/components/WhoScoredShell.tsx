@@ -24,7 +24,11 @@ type Props = {
 
   homeGoals: PlayerGoalGroup[];
   awayGoals: PlayerGoalGroup[];
+
+  
 };
+
+
 
 export default function WhoScoredShell({
   puzzleId,
@@ -47,6 +51,60 @@ export default function WhoScoredShell({
   const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
   const [sheetValue, setSheetValue] = useState("");
   const [sheetShake, setSheetShake] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
+
+  async function handleShare() {
+    const url = `${window.location.origin}/who-scored?difficulty=${difficulty}&puzzleId=${puzzleId}`;
+    const shareScore = finalScore ?? totals.score;
+
+    const allStates = allScorerIds.map((id) => getPlayerState(id));
+
+  
+
+    const text = [
+      `I scored ${shareScore} on World Cup Who Scored! ⚽️`,
+      `Can you do better?`,
+      `Play here now!`,
+    ].join("\n");
+
+    // 1) Native share
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "World Cup Who Scored",
+          text,
+          url,
+        });
+        return;
+      } catch (err: any) {
+        if (err?.name === "AbortError") return;
+      }
+    }
+
+    // 2) Clipboard
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied to clipboard");
+      return;
+    } catch {}
+
+    // 3) iOS fallback
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      alert("Copied to clipboard");
+    } catch {}
+  }
 
 
   function getActiveScorer() {
@@ -60,7 +118,24 @@ export default function WhoScoredShell({
     return name[0].toUpperCase() + name.slice(1).toLowerCase();
   }
   
+  function toBoxState(playerId: string) {
+    const p = getPlayerState(playerId);
+    const scorer = [...homeGoals, ...awayGoals].find((g) => g.player_id === playerId);
   
+    const surname = scorer?.family_name?.trim() ?? "";
+    const first = surname ? surname[0].toUpperCase() : "";
+  
+    return {
+      value: p.hintUsed ? first : "",
+      status: p.status === "correct" ? ("correct" as const) : ("idle" as const),
+      pointsAwarded: p.pointsAwarded ?? null,
+      hintUsed: p.hintUsed,
+      firstLetterRevealed: p.hintUsed ? first : null,
+      revealed: p.status === "revealed",
+    };
+  }
+  
+
 
   type PersistedWhoScoredState = {
     players: Record<
@@ -114,18 +189,50 @@ export default function WhoScoredShell({
     };
   }
 
-  function setPlayerBoxState(playerId: string, boxState: any) {
-    setPersisted((prev) => ({
-      ...prev,
-      players: {
-        ...(prev.players ?? {}),
-        [playerId]: {
-          ...getPlayerState(playerId),
-          boxState,
-        },
-      },
-    }));
+    const allScorerIds = [
+    ...homeGoals.map((g) => g.player_id),
+    ...awayGoals.map((g) => g.player_id),
+  ];
+
+  function isLockedState(s: ReturnType<typeof getPlayerState>) {
+    return s.status === "correct" || s.status === "revealed";
   }
+
+  const completion = {
+    score: allScorerIds.reduce(
+      (sum, id) => sum + (getPlayerState(id).pointsAwarded ?? 0),
+      0
+    ),
+    resolvedCount: allScorerIds.filter((id) => isLockedState(getPlayerState(id))).length,
+    total: allScorerIds.length,
+  };
+  
+  const isComplete =
+    completion.resolvedCount === completion.total && completion.total > 0;
+  
+
+
+  function setPlayerBoxState(playerId: string, boxState: any) {
+    setPersisted((prev) => {
+      const existing = prev.players?.[playerId] ?? {
+        status: "idle" as const,
+        hintUsed: false,
+        pointsAwarded: null as number | null,
+      };
+  
+      return {
+        ...prev,
+        players: {
+          ...(prev.players ?? {}),
+          [playerId]: {
+            ...existing,
+            boxState,
+          },
+        },
+      };
+    });
+  }
+  
   
   
   function setPlayerState(
@@ -149,33 +256,45 @@ export default function WhoScoredShell({
     const s = getPlayerState(playerId);
     if (s.hintUsed) return;
   
-    setPlayerState(playerId, {
+    const next = {
       ...s,
       hintUsed: true,
-    });
+    };
+  
+    setPlayerState(playerId, next);
+    setPlayerBoxState(playerId, toBoxState(playerId));
   }
+  
   
   function markRevealed(playerId: string) {
     const s = getPlayerState(playerId);
     if (s.status === "correct" || s.status === "revealed") return;
   
-    setPlayerState(playerId, {
+    const next = {
       ...s,
-      status: "revealed",
+      status: "revealed" as const,
       pointsAwarded: 0,
-    });
+    };
+  
+    setPlayerState(playerId, next);
+    setPlayerBoxState(playerId, toBoxState(playerId));
   }
+  
   
   function markCorrect(playerId: string) {
     const s = getPlayerState(playerId);
     if (s.status === "correct") return;
   
-    setPlayerState(playerId, {
+    const next = {
       ...s,
-      status: "correct",
-      pointsAwarded: s.hintUsed ? 1 : 2, // temporary: we’ll align scoring next
-    });
+      status: "correct" as const,
+      pointsAwarded: s.hintUsed ? 5 : 10,
+    };
+  
+    setPlayerState(playerId, next);
+    setPlayerBoxState(playerId, toBoxState(playerId));
   }
+  
   
   // ---- Active flags (derived from map state) ----
   const activeState = activePlayerId ? getPlayerState(activePlayerId) : null;
@@ -184,6 +303,8 @@ export default function WhoScoredShell({
   const activeIsRevealed = activeState?.status === "revealed";
   const activeIsHinted = activeState?.hintUsed === true;
   const activeIsLocked = activeIsSolved || activeIsRevealed;
+
+  
   
 
 useEffect(() => {
@@ -222,6 +343,17 @@ useEffect(() => {
       // ignore quota/write errors
     }
   }, [storageKey, persisted, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    if (isComplete) {
+        setFinalScore(completion.score);
+
+      setShowCompletion(true);
+    }
+  }, [isHydrated, isComplete, completion.score]);
+
   
   
   function normalizeText(s: string) {
@@ -291,9 +423,55 @@ useEffect(() => {
     }));
 
     const playerStatesForScoreboard: Record<string, any> = {};
-for (const [playerId, p] of Object.entries(persisted.players ?? {})) {
-  if (p?.boxState) playerStatesForScoreboard[playerId] = p.boxState;
-}
+
+    const allPlayerIds = [...homeGoals, ...awayGoals].map((g) => g.player_id);
+
+const totals = allPlayerIds.reduce(
+  (acc, playerId) => {
+    const s = getPlayerState(playerId);
+    const pts = typeof s.pointsAwarded === "number" ? s.pointsAwarded : 0;
+
+    acc.score += pts;
+    if (s.status === "correct") acc.solved += 1;
+    if (s.status === "revealed") acc.revealed += 1;
+
+    return acc;
+  },
+  { score: 0, solved: 0, revealed: 0 }
+);
+
+const totalAnswers = allPlayerIds.length;
+const completedAnswers = completion.resolvedCount;
+
+
+
+    const allScorers = [...homeGoals, ...awayGoals];
+    for (const g of allScorers) {
+      const p = persisted.players?.[g.player_id];
+    
+      // Prefer real boxState if present (desktop input)
+      // but if the sheet has solved/revealed/hint state, override with that
+      const sheetDerived = toBoxState(g.player_id);
+    
+      if (p?.boxState) {
+        playerStatesForScoreboard[g.player_id] = {
+          ...p.boxState,
+          // sheet is the source of truth for solved/revealed/points/hint
+          status: sheetDerived.status,
+          revealed: sheetDerived.revealed,
+          pointsAwarded: sheetDerived.pointsAwarded,
+          hintUsed: sheetDerived.hintUsed,
+          firstLetterRevealed: sheetDerived.firstLetterRevealed,
+          // keep value from boxState (what they typed) unless sheet forced a hint
+          value: sheetDerived.hintUsed ? sheetDerived.value : p.boxState.value,
+        };
+      } else {
+        playerStatesForScoreboard[g.player_id] = sheetDerived;
+      }
+    }
+    
+    
+    
 
   
 
@@ -307,61 +485,149 @@ for (const [playerId, p] of Object.entries(persisted.players ?? {})) {
       </a>
 
       <div className="mx-auto w-full max-w-4xl">
-        {/* Header card */}
-        <header className="w-full rounded-2xl bg-emerald-900/90 p-4 shadow-lg ring-2 ring-white/80">
-          <div className="flex flex-col gap-2">
-            <div className="text-lg sm:text-xl font-semibold tracking-tight text-white">
-              Who Scored?
-            </div>
+       {/* Header card */}
+<header className="w-full rounded-2xl bg-emerald-900/90 p-4 shadow-lg ring-2 ring-white/80">
+  <div className="flex items-start justify-between gap-4">
 
-            <div className="text-sm font-semibold text-white/80">
-              {matchDate.slice(0, 4)}
-              <span className="mx-1 text-gray-400">·</span>
-              {matchName}
-              <span className="mx-1 text-gray-400">·</span>
-              {stageName}
-            </div>
-
-            <div className="mt-2 flex items-center gap-2">
-              <a
-                href="/who-scored"
-                className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
-              >
-                Switch
-              </a>
-            </div>
-
-            {isDev ? (
-  <div className="mt-3 space-y-2">
-    <div className="text-sm font-semibold text-emerald-200">
-      DEV MODE enabled — {difficulty.toUpperCase()} — {puzzleId}
-    </div>
-
-    {isDev && activePlayerId ? (
-  <div className="mt-2 text-xs font-semibold text-white/70">
-    Active scorer: {activePlayerId}
-  </div>
-) : null}
-
-
+  {showCompletion ? (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+    {/* background overlay */}
     <button
       type="button"
-      className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
-      onClick={() => {
-        const firstHome = homeGoals[0]?.player_id;
-        if (!firstHome) return;
+      aria-label="Close completion modal"
+      className="absolute inset-0 bg-black/50"
+      onClick={() => setShowCompletion(false)}
+    />
 
-        markCorrect(firstHome);
+    {/* modal card */}
+    <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white p-5 shadow-xl">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-lg font-bold text-gray-900">Completed! 🎉</div>
+        </div>
 
-      }}
-    >
-      Dev: Mark first home scorer solved
-    </button>
+        <button
+          type="button"
+          className="rounded-xl bg-gray-100 px-3 py-1.5 text-sm font-extrabold text-gray-900 hover:bg-gray-200 transition"
+          onClick={() => {
+            setShowCompletion(false);
+
+            if (isDev) {
+              // OPTIONAL (dev reset): if you want, clear LS + reset state here
+              // localStorage.removeItem(storageKey);
+              // setPersisted({ players: {} });
+              // setFinalScore(null);
+            }
+          }}
+        >
+          Close
+        </button>
+      </div>
+
+      <div className="mt-6 text-center">
+        <div className="text-sm font-medium text-gray-600">Today’s score</div>
+
+        <div className="relative mt-3 inline-flex items-center justify-center rounded-3xl bg-blue-50 px-8 py-4">
+          <span className="text-5xl font-semibold leading-none tracking-tight text-green-600 tabular-nums">
+            {finalScore ?? completion.score}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-2">
+        <button
+          type="button"
+          className="w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] hover:bg-emerald-600"
+          onClick={handleShare}
+        >
+          Share
+        </button>
+      </div>
+
+      {isDev ? (
+        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
+          Dev mode: Close can optionally reset this puzzle for replay.
+        </div>
+      ) : null}
+    </div>
   </div>
 ) : null}
 
+
+    {/* LEFT COLUMN */}
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="text-lg sm:text-xl font-semibold tracking-tight text-white">
+        Who Scored?
+      </div>
+
+      <div className="text-sm font-semibold text-white/80 break-words">
+        {matchDate.slice(0, 4)}
+        <span className="mx-1 text-gray-400">·</span>
+        {matchName}
+        <span className="mx-1 text-gray-400">·</span>
+        {stageName}
+      </div>
+
+      <div className="mt-2 flex items-center gap-2">
+        <a
+          href="/who-scored"
+          className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+        >
+          Switch
+        </a>
+      </div>
+
+      {isDev ? (
+        <div className="mt-3 space-y-2">
+          <div className="text-sm font-semibold text-emerald-200">
+            DEV MODE enabled — {difficulty.toUpperCase()} — {puzzleId}
           </div>
-        </header>
+
+          {isDev && activePlayerId ? (
+            <div className="mt-2 text-xs font-semibold text-white/70">
+              Active scorer: {activePlayerId}
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+            onClick={() => {
+              const firstHome = homeGoals[0]?.player_id;
+              if (!firstHome) return;
+              markCorrect(firstHome);
+            }}
+          >
+            Dev: Mark first home scorer solved
+          </button>
+        </div>
+      ) : null}
+    </div>
+
+ {/* RIGHT COLUMN — SCORE (Missing 11 style) */}
+{/* Right: score (Missing 11 exact style) */}
+<div className="flex justify-end">
+  <div className="flex h-16 w-20 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-900/90 to-emerald-700/80 ring-2 ring-white/70">
+    <div className="text-sm font-bold leading-none text-white/90 uppercase tracking-wide">
+      Score
+    </div>
+
+    <div className="mt-1 text-xl font-bold leading-none text-emerald-200 tabular-nums">
+      {isHydrated ? totals.score : 0}
+    </div>
+  </div>
+</div>
+</div>
+{!isDev && isHydrated && isComplete ? (
+  <div className="mt-3 px-2 text-sm font-bold text-white">
+    Completed for today — come back tomorrow for a new puzzle.
+  </div>
+) : null}
+
+</header>
+
+
+
 
         {/* Scoreboard */}
         <div className="mt-4">
@@ -540,9 +806,18 @@ onPlayerStateChange={(playerId, state) => setPlayerBoxState(playerId, state)}
     </>
   ) : (
     <div className="mt-6 rounded-2xl bg-gray-50 px-4 py-5 text-center text-base font-bold text-gray-900">
-      <span className="text-emerald-700">+1pt ✅</span>
+      {activeIsSolved ? (
+        <span className="text-emerald-700">
+          +{activeState?.pointsAwarded ?? 10}pts ✅
+        </span>
+      ) : (
+        <span className="text-gray-700">
+          0pts 👁️
+        </span>
+      )}
     </div>
-  )}
+  )
+  }
 </div>
 
           </div>
