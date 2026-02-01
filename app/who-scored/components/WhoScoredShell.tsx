@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import HowToPlayModal from "../../components/HowToPlayModal";
+
+
 
 
 import WhoScoredScoreboard from "./WhoScoredScoreboard";
@@ -53,7 +56,9 @@ export default function WhoScoredShell({
   const [sheetShake, setSheetShake] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [finalScore, setFinalScore] = useState<number | null>(null);
-
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const howToKey = `howto:who-scored:${difficulty}`;
+  
   async function handleShare() {
     const url = `${window.location.origin}/who-scored?difficulty=${difficulty}&puzzleId=${puzzleId}`;
     const shareScore = finalScore ?? totals.score;
@@ -157,6 +162,16 @@ export default function WhoScoredShell({
     players: {},
   });
       
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+  
+    // show once per device per difficulty
+    const seen = localStorage.getItem(howToKey);
+    if (!seen) {
+      setShowHowToPlay(true);
+      localStorage.setItem(howToKey, "1");
+    }
+  }, [howToKey]);
   
   
   
@@ -568,14 +583,24 @@ const completedAnswers = completion.resolvedCount;
         {stageName}
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
-        <a
-          href="/who-scored"
-          className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
-        >
-          Switch
-        </a>
-      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+  <a
+    href="/who-scored"
+    className="inline-flex items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+  >
+    Switch
+  </a>
+
+  <button
+    type="button"
+    onClick={() => setShowHowToPlay(true)}
+    className="inline-flex items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+  >
+    How to play
+  </button>
+</div>
+
+
 
       {isDev ? (
         <div className="mt-3 space-y-2">
@@ -645,7 +670,64 @@ const completedAnswers = completion.resolvedCount;
                 setSheetShake(false);
               }}
               playerStates={playerStatesForScoreboard}
-onPlayerStateChange={(playerId, state) => setPlayerBoxState(playerId, state)}
+              onPlayerStateChange={(playerId, boxState) => {
+                // always store the desktop boxState
+                setPlayerBoxState(playerId, boxState);
+              
+                // ALSO sync to the canonical player state used for totals/completion
+                setPersisted((prev) => {
+                  const current =
+                    prev.players?.[playerId] ?? {
+                      status: "idle" as const,
+                      hintUsed: false,
+                      pointsAwarded: null as number | null,
+                    };
+              
+                  const nextStatus =
+                    boxState?.revealed === true
+                      ? ("revealed" as const)
+                      : boxState?.status === "correct"
+                      ? ("correct" as const)
+                      : ("idle" as const);
+              
+                  // Prefer the boxState points if present (it should be 10/5/0 now)
+                  const nextPoints =
+                    nextStatus === "correct"
+                      ? (typeof boxState?.pointsAwarded === "number"
+                          ? boxState.pointsAwarded
+                          : current.pointsAwarded)
+                      : nextStatus === "revealed"
+                      ? 0
+                      : current.pointsAwarded;
+              
+                  const next = {
+                    ...current,
+                    status: nextStatus,
+                    hintUsed: boxState?.hintUsed === true ? true : current.hintUsed,
+                    pointsAwarded: nextPoints,
+                    boxState, // keep boxState here too so everything is in one place
+                  };
+              
+                  // no-op if nothing actually changed
+                  if (
+                    current.status === next.status &&
+                    current.hintUsed === next.hintUsed &&
+                    current.pointsAwarded === next.pointsAwarded &&
+                    current.boxState === next.boxState
+                  ) {
+                    return prev;
+                  }
+              
+                  return {
+                    ...prev,
+                    players: {
+                      ...(prev.players ?? {}),
+                      [playerId]: next,
+                    },
+                  };
+                });
+              }}
+              
 
               
 
@@ -845,6 +927,13 @@ onPlayerStateChange={(playerId, state) => setPlayerBoxState(playerId, state)}
 
 
 </div>
+
+<HowToPlayModal
+  open={showHowToPlay}
+  onClose={() => setShowHowToPlay(false)}
+  game="who-scored"
+/>
+
 
     </main>
   );

@@ -81,6 +81,8 @@ useEffect(() => {
   setIsEditing(window.innerWidth >= 640);
 }, []);
 
+const isHydratingRef = useRef(false);
+
       
   const [shake, setShake] = useState(false);
   const [value, setValue] = useState(persistedState?.value ?? "");
@@ -106,48 +108,57 @@ const hasMountedRef = useRef(false);
 const lastHydrateRef = useRef<string>("");
 
 useEffect(() => {
-  if (!persistedState) return;
+    if (!persistedState) return;
+  
+    const serialized = JSON.stringify(persistedState);
+    if (serialized === lastHydrateRef.current) return;
+  
+    lastHydrateRef.current = serialized;
+  
+    isHydratingRef.current = true;
+  
+    setValue(persistedState.value ?? "");
+    setStatus(persistedState.status ?? "idle");
+    setPointsAwarded(persistedState.pointsAwarded ?? null);
+    setHintUsed(persistedState.hintUsed ?? false);
+    setFirstLetterRevealed(persistedState.firstLetterRevealed ?? null);
+    setRevealed(persistedState.revealed ?? false);
+  
+    // allow downstream onStateChange on subsequent *user* edits
+    queueMicrotask(() => {
+      isHydratingRef.current = false;
+    });
+  }, [persistedState]);
+  
 
-  const serialized = JSON.stringify(persistedState);
-  if (serialized === lastHydrateRef.current) return;
-
-  lastHydrateRef.current = serialized;
-
-  setValue(persistedState.value ?? "");
-  setStatus(persistedState.status ?? "idle");
-  setPointsAwarded(persistedState.pointsAwarded ?? null);
-  setHintUsed(persistedState.hintUsed ?? false);
-  setFirstLetterRevealed(persistedState.firstLetterRevealed ?? null);
-  setRevealed(persistedState.revealed ?? false);
-}, [persistedState]);
 
 
 
-
-
-useEffect(() => {
-  if (!onStateChange) return;
-
-  if (!hasMountedRef.current) {
-    hasMountedRef.current = true;
-    return;
-  }  
-
-  const payload = {
-    value,
-    status,
-    pointsAwarded,
-    hintUsed,
-    firstLetterRevealed,
-    revealed,
-  };
-
-  const serialized = JSON.stringify(payload);
-  if (serialized === lastSentRef.current) return;
-
-  lastSentRef.current = serialized;
-  onStateChange(payload);
-}, [value, status, pointsAwarded, hintUsed, firstLetterRevealed, revealed, onStateChange]);
+  useEffect(() => {
+    if (!onStateChange) return;
+    if (isHydratingRef.current) return; // ✅ prevents infinite loop
+  
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+  
+    const payload = {
+      value,
+      status,
+      pointsAwarded,
+      hintUsed,
+      firstLetterRevealed,
+      revealed,
+    };
+  
+    const serialized = JSON.stringify(payload);
+    if (serialized === lastSentRef.current) return;
+  
+    lastSentRef.current = serialized;
+    onStateChange(payload);
+  }, [value, status, pointsAwarded, hintUsed, firstLetterRevealed, revealed, onStateChange]);
+  
 
 
 
