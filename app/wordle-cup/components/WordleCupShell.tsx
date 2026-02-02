@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import HowToPlayModal from "../../components/HowToPlayModal"; // adjust relative path to your shell file
+
+
+
 
 
 type Difficulty = "easy" | "hard";
@@ -27,6 +31,24 @@ export default function WordleCupShell({
 }) {
 
   const [isComplete, setIsComplete] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+  
+    // Open How to Play once per device/browser
+    const key = "howtoplay:seen:wordle-cup";
+    const seen = window.localStorage.getItem(key);
+  
+    if (!seen) {
+      setShowHowToPlay(true);
+      window.localStorage.setItem(key, "1");
+    }
+  }, []);
+  
+
+  
+  
 
   return (
     <main className="bg-emerald-800 p-6 flex flex-col gap-3 min-h-screen text-white">
@@ -36,6 +58,13 @@ export default function WordleCupShell({
       >
         ← Back to Home
       </a>
+
+      <HowToPlayModal
+  open={showHowToPlay}
+  onClose={() => setShowHowToPlay(false)}
+  game="wordle-cup"
+/>
+
   
       <div className="mx-auto w-full max-w-4xl">
         {/* Header card (like Missing 11) */}
@@ -51,28 +80,23 @@ export default function WordleCupShell({
 
 <div className="mt-2 flex items-center gap-2">
   <a
-   href={`/wordle-cup?puzzleId=${puzzleId}`}
-
+    href="/wordle-cup"
     className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
   >
     Switch
   </a>
+
+
+  <button
+    type="button"
+    onClick={() => setShowHowToPlay(true)}
+    className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+  >
+    How to play
+  </button>
+</div>
 </div>
 
-  
-{!isDev && isComplete ? (
-  <div className="mt-3 px-2 text-sm font-bold text-white">
-    Completed for today — come back tomorrow for a new puzzle.
-  </div>
-) : null}
-
-{isDev ? (
-  <div className="mt-3 text-sm font-semibold text-emerald-200">
-    DEV MODE: Answer is {answer}
-  </div>
-) : null}
-
-          </div>
         </header>
   
         {/* Game (NOT inside a bordered card) */}

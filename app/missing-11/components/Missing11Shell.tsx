@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import HowToPlayModal from "../../components/HowToPlayModal";
 
 
 import Missing11Game from "./Missing11Game";
@@ -70,6 +71,22 @@ type Props = {
   const activeState =
   activePlayerId ? persistedPlayers[activePlayerId] : null;
   const [sheetShake, setSheetShake] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+
+useEffect(() => {
+  // only run on client
+  if (typeof window === "undefined") return;
+
+  const key = `howtoplay:seen:missing-11`;
+  const seen = localStorage.getItem(key);
+
+  if (!seen) {
+    setShowHowToPlay(true);
+    localStorage.setItem(key, "1");
+  }
+}, []);
+
 
   useEffect(() => {
     if (!activePlayerId) return;
@@ -374,15 +391,13 @@ if (navigator.share) {
   </a>
 
   <button
-    type="button"
-    onClick={handleShare}
-    className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-emerald-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 active:scale-[0.99]"
+  type="button"
+  onClick={() => setShowHowToPlay(true)}
+  className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+>
+  How to play
+</button>
 
-
-
-  >
-    Share
-  </button>
 </div>
 
       </div>
@@ -416,13 +431,13 @@ if (navigator.share) {
   </a>
 
   <button
-    type="button"
-    onClick={handleShare}
-    className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-emerald-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 active:scale-[0.99]"
+  type="button"
+  onClick={() => setShowHowToPlay(true)}
+  className="inline-flex w-fit items-center justify-center rounded-xl border border-white/70 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 active:scale-[0.99]"
+>
+  How to play
+</button>
 
-  >
-    Share
-  </button>
 </div>
 
   </div>
@@ -434,6 +449,14 @@ if (navigator.share) {
 ) : null}
 
 </header>
+
+<HowToPlayModal
+  open={showHowToPlay}
+  onClose={() => setShowHowToPlay(false)}
+  game="missing-11"
+/>
+
+
 
 {showCompletion ? (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
