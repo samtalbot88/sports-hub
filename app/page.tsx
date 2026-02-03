@@ -255,20 +255,20 @@ export default function HomePage() {
 
 {activeTab === "fixtures" ? (
   <section>
-    <div className="rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700">
-      <div className="text-lg font-extrabold text-white">
-        World Cup Fixtures
-      </div>
-
-      <p className="mt-2 text-sm font-semibold text-white/80">
-        Match schedules, kick-off times and upcoming World Cup fixtures.
-      </p>
-
-      <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-white/60">
-        Coming soon
-      </span>
+  <a
+    href="/fixtures"
+    className="block rounded-2xl border-2 border-white/80 bg-emerald-800/90 p-6 shadow-lg backdrop-blur-sm transition hover:bg-emerald-700 active:scale-[0.99]"
+  >
+    <div className="text-lg font-extrabold text-white">
+      World Cup Fixtures
     </div>
-  </section>
+
+    <p className="mt-2 text-sm font-semibold text-white/80">
+      Match schedules, kick-off times and upcoming World Cup fixtures.
+    </p>
+  </a>
+</section>
+
 ) : null}
 
 
