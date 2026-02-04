@@ -79,7 +79,7 @@ export default async function WhoScoredPage({
             >
               <div className="text-lg font-extrabold text-white">Easy</div>
               <p className="mt-2 text-m font-semibold text-white/90">
-                Major nations • Modern World Cups (2010–2022)
+                Major Teams • Modern World Cups (2014–2022)
               </p>
               <span className="mt-3 inline-block text-s font-semibold text-emerald-200">
                 Play Now!
@@ -92,7 +92,7 @@ export default async function WhoScoredPage({
             >
               <div className="text-lg font-extrabold text-white">Hard</div>
               <p className="mt-2 text-m font-semibold text-white/90">
-                Smaller nations • 1980 onwards
+                Other Teams • 2002 onwards
               </p>
               <span className="mt-3 inline-block text-s font-semibold text-emerald-200">
                 Play Now!

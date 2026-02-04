@@ -125,7 +125,7 @@ if (!difficulty) {
   </div>
 
   <p className="mt-2 text-m font-semibold text-white/90">
-    Players from major teams • Modern World Cups (2014–2022)
+    Major teams • Modern World Cups (2014–2022)
   </p>
 
   <span className="mt-3 inline-block text-s font-semibold text-emerald-200">
@@ -145,7 +145,7 @@ if (!difficulty) {
   </div>
 
   <p className="mt-2 text-m font-semibold text-white/90">
-    Players from all other teams • 2010 onwards
+    Other teams • 2010 onwards
   </p>
 
   <span className="mt-3 inline-block text-s font-semibold text-emerald-200">

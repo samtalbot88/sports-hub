@@ -35,6 +35,13 @@ const EASY_TEAMS = new Set([
 
 const EASY_YEARS = new Set(["2010", "2014", "2018", "2022"]);
 
+function isKnockoutStage(stageName?: string) {
+  const s = String(stageName || "").trim().toLowerCase();
+  if (!s) return false;
+  if (s === "group stage") return false;
+  return true;
+}
+
 type GoalRow = {
   key_id: string;
   goal_id: string;
@@ -178,21 +185,24 @@ const awayTeamName =
 
     const isAET = goals.some((g) => isExtraTimePeriod(g.match_period));
 
-    // Difficulty filtering (mirrors Missing 11 approach as closely as possible)
-    if (difficulty === "easy") {
-      const passesYear = EASY_YEARS.has(year);
-      const passesTeam =
-        EASY_TEAMS.has(homeTeamName) || EASY_TEAMS.has(awayTeamName);
-      if (!passesYear || !passesTeam) continue;
-    }
+ // Difficulty filtering (match Missing 11 / Wordle rules)
+if (difficulty === "easy") {
+  const passesYear = year >= "2014";
+  const passesTeam =
+    EASY_TEAMS.has(homeTeamName) || EASY_TEAMS.has(awayTeamName);
+  if (!passesYear || !passesTeam) continue;
+}
 
-    if (difficulty === "hard") {
-      // Hard excludes “easy teams”, like Missing 11 hard does
-      if (year < "1980") continue;
-      const bothAreEasyTeams =
-        EASY_TEAMS.has(homeTeamName) || EASY_TEAMS.has(awayTeamName);
-      if (bothAreEasyTeams) continue;
-    }
+if (difficulty === "hard") {
+  // Hard: 2002+ , knockout only, and exclude easy teams
+  if (year < "2002") continue;
+  if (!isKnockoutStage(sample.stage_name)) continue;
+
+  const hasEasyTeam =
+    EASY_TEAMS.has(homeTeamName) || EASY_TEAMS.has(awayTeamName);
+  if (hasEasyTeam) continue;
+}
+
 
     candidates.push({
       match_id: sample.match_id,
