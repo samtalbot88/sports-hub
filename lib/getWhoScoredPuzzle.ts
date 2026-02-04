@@ -72,6 +72,23 @@ type GoalRow = {
   penalty: string; // "1" | "0"
 };
 
+function isMensWorldCup(row: { tournament_id?: string; tournament_name?: string }) {
+  const id = String(row.tournament_id || "").toUpperCase();
+  const name = String(row.tournament_name || "").toLowerCase();
+
+  // hard exclude anything women's
+  if (name.includes("women")) return false;
+
+  // allow classic men's dataset ids like "WC-2010"
+  if (id.startsWith("WC-")) return true;
+
+  // fallback: allow if name explicitly says men's world cup
+  if (name.includes("men") && name.includes("world cup")) return true;
+
+  return false;
+}
+
+
 function stableIndexFromKey(key: string, length: number): number {
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
@@ -120,7 +137,8 @@ export function getWhoScoredPuzzle({
       ? puzzleId
       : new Date().toISOString().slice(0, 10);
 
-  const rows = loadGoals();
+      const rows = loadGoals().filter(isMensWorldCup);
+
 
   // 1) Group all goals by match_id
   const byMatch = new Map<string, GoalRow[]>();

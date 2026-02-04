@@ -102,7 +102,13 @@ export function getLineup({
   puzzleId?: string;
 }) {
 
-  const records = loadPlayerAppearances();
+  const records = loadPlayerAppearances().filter((r: any) => {
+    const id = String(r.tournament_id || "").toUpperCase();
+    const name = String(r.tournament_name || "").toLowerCase();
+    if (name.includes("women")) return false;
+    return id.startsWith("WC-") || (name.includes("men") && name.includes("world cup"));
+  });
+  
   const starters = records.filter((r) => r.starter === "1");
 
   const groups = new Map<string, any[]>();
