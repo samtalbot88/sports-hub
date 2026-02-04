@@ -15,6 +15,14 @@ const EASY_TEAMS = new Set([
   "Argentina",
 ]);
 
+function isKnockoutStage(stageName?: string) {
+  const s = String(stageName || "").trim().toLowerCase();
+  if (!s) return false;
+  if (s === "group stage") return false;
+  return true;
+}
+
+
 const EASY_YEARS = new Set(["2010", "2014", "2018", "2022"]);
 
 const POSITION_TO_ROW: Record<string, "GK" | "DF" | "MF" | "FW"> = {
@@ -41,10 +49,13 @@ const POSITION_TO_ROW: Record<string, "GK" | "DF" | "MF" | "FW"> = {
   CB: "DF",
   LWB: "DF",
   RWB: "DF",
+  SW: "DF",
 
   DM: "MF",
   CM: "MF",
   AM: "MF",
+  LM: "MF",
+  RM: "MF",
 
   LW: "FW",
   RW: "FW",
@@ -111,10 +122,12 @@ export function getLineup({
       match_id: sample.match_id,
       match_name: sample.match_name,
       match_date: sample.match_date,
+      stage_name: sample.stage_name, // ADD THIS
       team_name: sample.team_name,
       team_code: sample.team_code,
       players,
     });
+    
   }
 
   let filtered = candidates;
@@ -129,9 +142,15 @@ export function getLineup({
   if (difficulty === "hard") {
     filtered = candidates.filter((c) => {
       const year = c.match_date.slice(0, 4);
-      return year >= "1980" && !EASY_TEAMS.has(c.team_name);
+  
+      return (
+        year >= "2002" && // <-- change to 2002 if we want bigger pool
+        !EASY_TEAMS.has(c.team_name) &&
+        isKnockoutStage(c.stage_name)
+      );
     });
   }
+  
 
 
 
